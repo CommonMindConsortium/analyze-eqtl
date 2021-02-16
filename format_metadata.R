@@ -6,7 +6,7 @@
 # load helper functions
 source("utils/utilities.R")
 # load packages
-lilbrary(dplyr)
+library(dplyr)
 library(reticulate)
 library(tibble)
 library(tools)
