@@ -21,6 +21,7 @@ syn$login()
 covariate_synId <- "syn23567529"
 rna_metadata_synId <- "syn16816488"
 snp_metadata_synId <- "syn16816490"
+new_names <- "syn24172496"
 parent_folder <- "syn23682444"
 ##################################
 covars <- syn$get(covariate_synId)
@@ -32,12 +33,16 @@ dat <- get_synapse_data(covars) %>%
   rownames_to_column(var = "sample")
 
 snp <- get_synapse_data(md_snp) %>% 
-  select(Individual_ID, `SNP_report:Genotyping_Sample_ID`)
-
+  select(Individual_ID, `SNP_report:Genotyping_Sample_ID`) 
+  
 rna <- get_synapse_data(md_rna) %>% 
   select(Individual_ID, Sample_RNA_ID)
 
+new <- read_tsv(syn$get(new_names)$path, col_names = FALSE)
+
 md <- inner_join(rna, snp)
+
+md <- md[md$`SNP_report:Genotyping_Sample_ID` %in% new$X1,]
 
 dat <- right_join(md, dat, by = c("Sample_RNA_ID" = "sample"))
 
@@ -79,11 +84,11 @@ file <- ent$File(
   parent = parent_folder
 )
 
-synids <- c(covariate_synId,rna_metadata_synId,snp_metadata_synId)
+synids <- c(new_names,covariate_synId,rna_metadata_synId,snp_metadata_synId)
 
 syn$store(
   file, 
   forceVersion = FALSE, 
-  activityName = "Mapped identifiers.",
+  activityName = "Mapped identifiers + samples.",
   used = synids
   )
