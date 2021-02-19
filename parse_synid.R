@@ -1,5 +1,5 @@
 ######### Get input synapseId based on chromosome annotations
-load_packages("argparse")
+library("argparse")
 parser <- ArgumentParser(
   description = "Get input Synapse id."
 )
@@ -8,4 +8,5 @@ parser$add_argument("chromosome", type="character",
 args <- parser$parse_args()
 
 df <- read.table("SYNAPSE_TABLE_QUERY_72602897.csv", sep = ",", header = TRUE)
+
 cat(as.character(df$id[df$chromosome == args$chromosome]))
