@@ -1,0 +1,88 @@
+---
+title: "Plot number of eGenes versus PEER components"
+subtitle: ""
+author:
+- name: "[Gabriel Hoffman](http://gabrielhoffman.github.io) and Kelsey Montgomery"
+  affiliation: | 
+    Icahn School of Medicine at Mount Sinai, New York
+    Sage Bionetworks, Seattle
+date: "Run on `r Sys.time()`"
+documentclass: article
+output:
+  html_document:
+    toc: true
+    toc_float: true
+params:
+  upload: FALSE
+---
+
+
+<!---
+
+cd /hpc/users/hoffmg01/work/CMC/analyze-eqtl/
+# rm -rf vizualize/plot_eQTL_counts_cache
+
+rmarkdown::render("vizualize/plot_eQTL_counts.Rmd")
+
+
+
+--->
+ 
+
+```{r load}
+library(foreach)
+library(data.table)
+library(ggplot2)
+library(tools)
+library(synapser)
+
+synLogin()
+```
+
+```{r get.counts}
+pValue = 1e-6
+
+# Load parent
+res = synGetChildren("syn24860516")
+
+# get child files
+df_file = lapply(as.list(res), function(it){
+	data.frame(id = it$id , file = it$name, path = synGet(it$id)$path)
+	})
+df_file = data.table(do.call(rbind, df_file))
+
+# parse number of PEER components
+df_file$nPEER = as.numeric(file_ext(gsub(".txt.gz", "", df_file$file)))
+
+# get eQTL counts for each file for each PEER number
+df_counts = lapply( sort(unique(df_file$nPEER)), function(N){
+
+	# get array of files
+	files = df_file[nPEER==N,path]
+
+	# for each file
+	count = sapply(files, function(file){
+		# count eGenes at p < 1e-5
+		cmd = paste("zcat", file, "| awk '{if($15== 1 && $12 < ", pValue, ") print $1}' | wc -l")
+		fread(cmd = cmd)
+	})
+
+	data.frame(nPEER = N, count = sum(unlist(count)))
+})
+df_counts = do.call(rbind, df_counts)
+```
+
+```{r make.plot}
+# make plot
+ggplot(df_counts, aes(nPEER, count)) + geom_point() + theme_classic() + xlab("# PEER components") + ylab("# eGenes at p < 1e-5") + ylim(0, max(df_counts$count))
+```
+
+
+
+
+
+
+
+
+
+
