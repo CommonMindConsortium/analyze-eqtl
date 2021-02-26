@@ -74,7 +74,7 @@ df_counts = do.call(rbind, df_counts)
 
 ```{r make.plot}
 # make plot
-ggplot(df_counts, aes(nPEER, count)) + geom_point() + theme_classic() + xlab("# PEER components") + ylab("# eGenes at p < 1e-5") + ylim(0, max(df_counts$count))
+ggplot(df_counts, aes(nPEER, count)) + geom_point() + theme_classic() + xlab("# PEER components") + ylab("# eGenes at p < 1e-5") + ylim(0, max(df_counts$count)) + theme(aspect.ratio=1)
 ```
 
 
