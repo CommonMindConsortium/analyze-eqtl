@@ -22,6 +22,9 @@ params:
 cd /hpc/users/hoffmg01/work/CMC/analyze-eqtl/
 # rm -rf vizualize/plot_eQTL_counts_cache
 
+
+system("git pull")
+
 rmarkdown::render("visualize/plot_eQTL_counts.Rmd")
 
 
@@ -37,7 +40,16 @@ library(tools)
 library(synapser)
 
 synLogin()
+
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning=FALSE,
+  message=FALSE,
+  error = FALSE,
+  tidy = FALSE,
+  cache = TRUE)
 ```
+
 
 ```{r get.counts}
 pValue = 1e-6
