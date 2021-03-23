@@ -6,21 +6,22 @@ syn <- synapseclient$Synapse()
 ent <- synapseclient$entity
 # login to Synapse
 syn$login()
-ancestry_synId <- "syn2511399"
-new_names <- "syn24172496"
+ancestry_synId <- "syn9922992"
+new_names <- c("syn25299009", "syn25299006", "syn25298986")
 
-ancestry <- read_tsv(syn$get(ancestry_synId)$path) %>% 
-  filter(Cluster %in% c("A", "B", "E", "F", "G"))
+ancestry <- read_delim(syn$get(ancestry_synId)$path, delim = " ") %>% 
+  filter(Population %in% c("Caucasian"))
 
-new <- read_tsv(syn$get(new_names)$path, col_names = FALSE)
+new <- map(new_names, ~ read_tsv(syn$get(.)$path, col_names = FALSE)) %>% 
+  reduce(bind_rows)
 
 eu_samples <- new$X1[
-  new$X1 %in% ancestry$DNA_report..Genotyping.Sample_ID
+  new$X1 %in% ancestry$ID
   ]
 
 write.table(
   eu_samples,
-  "MPP_european.exc",
+  "HBCC_european.exc",
   sep = "\t", 
   row.names = FALSE, 
   col.names = FALSE,
@@ -28,7 +29,7 @@ write.table(
   )
 
 file <- ent$File(
-  "MPP_european.exc",
+  "HBCC_european.exc",
   parent = "syn23682444"
 )
 
@@ -37,6 +38,6 @@ synids <- c(new_names,ancestry_synId)
 syn$store(
   file, 
   forceVersion = FALSE, 
-  activityName = "Add clusters E, F, G to A, B",
+  activityName = "Subset and include caucasian population only",
   used = synids
 )
