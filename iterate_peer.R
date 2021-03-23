@@ -28,4 +28,9 @@ write.table(
   sep = "\t", 
   row.names = FALSE, 
   quote = FALSE
+<<<<<<< HEAD
   )
+=======
+  )
+
+>>>>>>> ef74d85afb4c3b95bdb1b8740c5ca34778ac9f8f

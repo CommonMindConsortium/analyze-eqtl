@@ -6,8 +6,8 @@ expression_ID="syn25192859"
 peer_ID="syn25191965"
 tissue="DLPFC"
 cellType="Olig"
-cohort="MSSM_Penn_Pitt"
-samples_by_ancestry="MPP_european.exc"
+cohort="HBCC"
+samples_by_ancestry="HBCC_european.exc"
 store_id="syn25258782"
 do_iteration () {
     Rscript iterate_peer.R "covariateMatrix_${4}_${5}_${6}.txt" "PEER_${4}_${5}_${6}.txt" $1
@@ -36,8 +36,11 @@ for ((CHROM=1; CHROM<=22;CHROM++));
 do
     ID=$(Rscript parse_synid.R $CHROM)
     echo "# Running chromosome: $CHROM"
-    bcftools view -i "(R2 > .7)" -S "${samples_by_ancestry}" "chr${CHROM}.dose.vcf.gz" \
-    | bcftools view -q 0.01:minor | bgzip > "chr${CHROM}.out.dose.vcf.gz"
+    bcftools view -i "(R2 > .7)" -S "${samples_by_ancestry}" "H1M/chr${CHROM}.dose.vcf.gz" \
+    | bcftools view -i "(R2 > .7)" -S "${samples_by_ancestry}" "H5M4/chr${CHROM}.dose.vcf.gz" \
+    | bcftools view -i "(R2 > .7)" -S "${samples_by_ancestry}" "H650K/chr${CHROM}.dose.vcf.gz" \
+    | bcftools merge
+| bcftools view -q 0.01:minor | bgzip > "chr${CHROM}.out.dose.vcf.gz"
     tabix -p vcf "chr${CHROM}.out.dose.vcf.gz"
     seq 0 50 | parallel do_iteration {} "$CHROM" "$ID" "$cohort" "$tissue" "$cellType" \
     "$samples_by_ancestry" "$store_id" "$covariate_ID" "$expression_ID" "$peer_ID"
