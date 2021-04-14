@@ -1,0 +1,85 @@
+---
+title: "Visualize saturation PEER factors"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+## MSSM-Penn-Pitt-DLPFC Cohort
+
+`QTLtools cis` implemented with `--nominal 0.01` and `--normal`. 
+
+588 samples with RNA-seq + SNP of which *464* are European 
+
+```{r set-up}
+library(purrr)
+library(dplyr)
+library(ggplot2)
+library(sagethemes)
+library(readr)
+synapseclient <- reticulate::import("synapseclient")
+syn <- synapseclient$Synapse()
+syn$login()
+
+# function
+# get_files <- function(table) {
+#   files <- table %>% 
+#     mutate(thefile = map(id,syn$get)) %>% 
+#     mutate(
+#       filecontents = map(
+#         thefile, 
+#         function(x) read_delim(
+#           readLines(
+#             x$path
+#             ),
+#           col_names = FALSE,
+#           delim = " "
+#           )
+#         )
+#     )
+# }
+```
+
+```{r get-data, message = FALSE}
+syn$tableQuery("select ROW_ID from syn24869959 limit 1")
+Sys.sleep(5)
+
+viz <- syn$tableQuery("select * from syn24869959 where tissue = 'DLPFC'")
+
+dat <- read_csv(viz$filepath) %>% 
+ select(-ROW_ID, -ROW_VERSION, -ROW_ETAG)
+```
+
+```{r across-genome, fig.height = 5, fig.width = 5, fig.align = "center"}
+dat_collapse <- dat %>% 
+  group_by(peer) %>% 
+  summarize(sum = sum(genes)) 
+
+all <- ggplot(data = dat_collapse, aes(x = peer, y = sum)) + 
+  geom_point() +
+  labs(
+    x = "# PEER components", 
+    y = "# eGenes at p < 1e-6"
+  ) + 
+  ylim(0, max(dat_collapse$sum)) + 
+  theme(aspect.ratio=1)
+
+all
+```
+
+
+```{r visualize, fig.height = 10, fig.width = 10, fig.align = "center"}
+p <- ggplot(data = dat, aes(x = peer, y = genes)) +
+  geom_point(size = 1, shape = ".") +
+  facet_wrap(~ chromosome, scales = "free") +
+  labs(
+    x = "# PEER components",
+    y = "# eGenes at p < 1e-6"
+    ) + 
+  ylim(0, max(dat$genes)) + 
+  theme(aspect.ratio=1)
+p
+```
+

@@ -2,8 +2,8 @@
 ######### PEER factors
 library(readr)
 library(dplyr)
-library(glue)
 library(argparse)
+library(glue)
 
 # create argument options
 parser <- ArgumentParser(
@@ -28,5 +28,9 @@ write.table(
   sep = "\t", 
   row.names = FALSE, 
   quote = FALSE
+<<<<<<< HEAD
+  )
+=======
   )
 
+>>>>>>> ef74d85afb4c3b95bdb1b8740c5ca34778ac9f8f
