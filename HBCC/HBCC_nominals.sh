@@ -2,14 +2,14 @@
 export PATH="$PATH:/usr/bin/bcftools-1.10"
 do_iteration () {
     QTLtools cis --vcf "chr${1}.merged.dose.vcf.gz" --bed "geneExpr_${4}_${5}_${11}.bed.gz" \
-    --cov "tmp_metadata_${2}.txt.gz" --out "chr${1}.${4}.${5}.${11}.nominals.txt" \
+    --cov "tmp_metadata_${2}.txt.gz" --nominal 1 --out "chr${1}.${4}.${5}.${11}.nominals.txt" \
     --normal --include-samples "$6"
     gzip "chr${1}.${4}.${5}.${11}.nominals.txt"
-    synapse --configPath "/tmp/.synapseConfig" store "chr${1}.${4}.${5}.${11}.permutations.txt.gz" \
+    synapse --configPath "/tmp/.synapseConfig" store "chr${1}.${4}.${5}.${11}.nominals.txt.gz" \
     --parentid "${7}" \
     --annotations '{"cohort":"'"${4}"'", "chromosome":"'"${1}"'", "tissue":"'"${5}"'","cellType": "'"${11}"'", "peer":"'"${2}"'", "type":"nominals"}' \
     --used $3 $8 $9 ${10}
-    rm "chr${1}.${4}.${5}.${11}.permutations.txt.gz" "tmp_metadata_${2}.txt.gz"
+    rm "chr${1}.${4}.${5}.${11}.nominals.txt.gz" "tmp_metadata_${2}.txt.gz"
 }
 
 export -f do_iteration
