@@ -22,7 +22,7 @@ do_iteration () {
     --parentid "${7}" \
     --annotations '{"cohort":"'"${4}"'", "chromosome":"'"${1}"'", "tissue":"'"${5}"'","cellType": "'"${11}"'", "peer":"'"${2}"'", "type":"thresholds"}' \
     --used $3 $8 $9 ${10}
-    rm "chr${1}.${4}.${5}.${11}.permutations.txt.gz" "tmp_metadata_${2}.txt.gz" "chr${1}.${4}.${5}.${11}.permutations.thresholds.txt.gz" \
+    rm "chr${1}.${4}.${5}.${11}.permutations.txt.gz" "chr${1}.${4}.${5}.${11}.permutations.thresholds.txt.gz" \
     "chr${1}.${4}.${5}.${11}.permutations.significant.txt.gz"
 }
 
@@ -50,3 +50,4 @@ rm "geneExpr_${cohort}_${tissue}_${cellType}.bed.gz"
 rm "geneExpr_${cohort}_${tissue}_${cellType}.bed.gz.tbi"
 rm "PEER_${cohort}_${tissue}_${cellType}.txt"
 rm "covariateMatrix_${cohort}_${tissue}_${cellType}.txt"
+rm "tmp_metadata_${cellType}.txt.gz"
